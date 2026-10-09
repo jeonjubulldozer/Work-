@@ -1,0 +1,299 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="../manifest.webmanifest"><meta name="theme-color" content="#1E5248"><meta name="robots" content="noindex,nofollow"><link rel="icon" href="../icon-192.png"></head><body>
+<script src="../vault.js" data-home="../"></script>
+<title>기업 현황판</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* layout: one reading column, a sticky row of four tabs, cards that fall to one column on a phone */
+:root{
+  --bg:#F3F5F7; --panel:#FFFFFF; --ink:#141A21; --muted:#5A6572; --line:#D9DFE6; --soft:#EAEEF2;
+  --accent:#1E5248; --accent-ink:#FFFFFF; --up:#C5302B; --down:#1F55C2; --warn:#9A5B06; --warn-bg:#FBF1DD;
+  --up-bg:#FBE9E7; --down-bg:#E6EEFB;
+  --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1318; --panel:#171D24; --ink:#E7ECF1; --muted:#98A5B3; --line:#2A333D; --soft:#1F2730;
+  --accent:#7CC9B8; --accent-ink:#0F1318; --up:#FF8076; --down:#84ADFF; --warn:#E3AA52; --warn-bg:#2E2513;
+  --up-bg:#3A1F1D; --down-bg:#1A2740; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0F1318; --panel:#171D24; --ink:#E7ECF1; --muted:#98A5B3; --line:#2A333D; --soft:#1F2730;
+  --accent:#7CC9B8; --accent-ink:#0F1318; --up:#FF8076; --down:#84ADFF; --warn:#E3AA52; --warn-bg:#2E2513;
+  --up-bg:#3A1F1D; --down-bg:#1A2740; color-scheme:dark }
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.65}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+h1{font-size:28px;font-weight:600;letter-spacing:-.01em;margin:0;text-wrap:balance}
+h2{font-size:19px;font-weight:600;margin:0 0 4px}
+h3{font-size:16px;font-weight:600;margin:0}
+h4{font-size:14.5px;font-weight:600;margin:0 0 2px}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:3px}
+.muted{color:var(--muted)} .small{font-size:13px} .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.head{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.head .sub{color:var(--muted);font-size:14px}
+.legend{font-size:13px;color:var(--muted)}
+.up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--muted)}
+.soon{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.soon h2{font-size:15px;margin-bottom:8px}
+.soon ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.soon li{display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:baseline}
+.soon .d{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.soon .w{min-width:0}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:22px}
+.tab{font:inherit;font-weight:500;padding:11px 8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tab:focus-visible,.chip:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel{display:flex;flex-direction:column;gap:26px}
+.sec{display:flex;flex-direction:column;gap:10px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.card .k{font-size:13.5px;color:var(--muted)}
+.card .v{font-family:var(--mono);font-size:24px;font-weight:500;letter-spacing:-.01em}
+.card .rows{display:grid;gap:1px;font-size:13.5px;margin-top:2px}
+.card .foot{font-size:12.5px;color:var(--muted);margin-top:6px}
+.recap{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.recap p{max-width:68ch}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font:inherit;font-size:13.5px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;text-decoration:none}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=search]{font:inherit;font-size:14px;padding:7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);min-width:0;width:200px;max-width:100%}
+.co{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;scroll-margin-top:76px}
+.co-h{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:baseline}
+.tk{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.wt{font-family:var(--mono);font-size:12.5px;background:var(--soft);padding:2px 8px;border-radius:999px}
+.sub-h{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.04em;margin-bottom:6px}
+.ev,.nw{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.ev li{display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:baseline}
+.ev .d,.nw .d{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.nw li{display:flex;flex-direction:column;gap:2px;padding-top:10px;border-top:1px solid var(--soft)}
+.nw li:first-child{border-top:0;padding-top:0}
+.nw .top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.nw .hl{font-weight:600}
+.nw p{max-width:72ch}
+.tone{font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.tone.good{color:var(--up);background:var(--up-bg);border-color:transparent}
+.tone.bad{color:var(--down);background:var(--down-bg);border-color:transparent}
+.tag{font-size:12px;padding:1px 7px;border-radius:4px;background:var(--soft);color:var(--muted);white-space:nowrap}
+.mv{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.mv li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;gap:2px}
+.mv .top{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.mv p{max-width:72ch;font-size:14px}
+.tag.est{background:var(--warn-bg);color:var(--warn)}
+.heat{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px}
+.tile{border-radius:8px;padding:10px 12px;border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;gap:2px;min-width:0}
+.tile .n{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .p{font-family:var(--mono);font-size:16px;font-weight:500}
+.tile .w{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:14px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--soft);vertical-align:top}
+th{font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+th:first-child,td:first-child,th.l,td.l{text-align:left}
+tr:last-child td{border-bottom:0}
+td .nm{font-weight:500} td .sm{font-size:12.5px;color:var(--muted)}
+td.val{max-width:280px;min-width:200px;white-space:normal;text-align:left;font-size:13px}
+details{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+details>summary{cursor:pointer;padding:14px 18px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"+";font-family:var(--mono);color:var(--muted);width:12px}
+details[open]>summary::before{content:"–"}
+.call{padding:0 20px 20px 42px;display:flex;flex-direction:column;gap:16px}
+.call p,.call li{max-width:72ch}
+.call ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.pt{display:flex;flex-direction:column;gap:2px}
+.note{background:var(--warn-bg);color:var(--ink);border-radius:8px;padding:12px 14px;font-size:13.5px}
+.note b{color:var(--warn)}
+.plain{padding:14px 18px;font-size:13px;color:var(--muted);display:grid;gap:6px}
+.err{padding:24px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+@media (max-width:560px){
+  .wrap{padding-inline:16px} h1{font-size:23px} .tabs{grid-template-columns:repeat(2,1fr)} .call{padding-left:20px}
+  .soon li,.ev li{grid-template-columns:1fr;gap:0}
+}
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <h1>기업 현황판</h1>
+    <div class="sub" id="sub">불러오는 중입니다.</div>
+    <div class="legend"><span class="up">빨강 ▲ 오름</span> · <span class="down">파랑 ▼ 내림</span> · 수량과 평가금액은 싣지 않습니다</div>
+  </header>
+
+  <section class="soon" id="soon" hidden>
+    <h2>앞으로 2주 안에 잡힌 일정</h2>
+    <ul id="soon-list"></ul>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="현황판 구역">
+    <button class="tab" role="tab" id="t-market" data-tab="market" aria-selected="true">시장 현황</button>
+    <button class="tab" role="tab" id="t-news" data-tab="news" aria-selected="false">기업 뉴스·일정</button>
+    <button class="tab" role="tab" id="t-price" data-tab="price" aria-selected="false">가격</button>
+    <button class="tab" role="tab" id="t-calls" data-tab="calls" aria-selected="false">실적 콜</button>
+  </nav>
+
+  <main>
+    <div class="panel" id="p-market" role="tabpanel" aria-labelledby="t-market"></div>
+    <div class="panel" id="p-news" role="tabpanel" aria-labelledby="t-news" hidden></div>
+    <div class="panel" id="p-price" role="tabpanel" aria-labelledby="t-price" hidden></div>
+    <div class="panel" id="p-calls" role="tabpanel" aria-labelledby="t-calls" hidden></div>
+  </main>
+</div>
+
+<script>
+(function(){
+  var TABS=["market","news","price","calls"], D=null, period="pct_1d", region="전체", query="";
+  function el(tag, cls, text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!==undefined&&text!==null) e.textContent=text; return e; }
+  function add(p){ for(var i=1;i<arguments.length;i++){ if(arguments[i]) p.appendChild(arguments[i]); } return p; }
+  function link(text, url){ if(!url) return el("span","muted",text); var a=el("a",null,text); a.href=url; a.target="_blank"; a.rel="noopener"; return a; }
+  function fmt(n, dec){ if(n===null||n===undefined) return "—"; return Number(n).toLocaleString("ko-KR",{minimumFractionDigits:dec,maximumFractionDigits:dec}); }
+  function auto(n){ if(n===null||n===undefined) return "—"; var a=Math.abs(n); return fmt(n, a>=1000?(Number.isInteger(n)?0:2):2); }
+  function cls(p){ return p===null||p===undefined?"flat":(p>0?"up":(p<0?"down":"flat")); }
+  function pct(p){ if(p===null||p===undefined) return "확인 못 함"; return (p>0?"▲ +":(p<0?"▼ ":"")+"")+fmt(p,2)+"%"; }
+  function md(s){ if(!s) return "날짜 미정"; var d=new Date(s+"T00:00:00"); if(isNaN(d)) return s; return (d.getMonth()+1)+"/"+d.getDate()+" ("+"일월화수목금토".charAt(d.getDay())+")"; }
+  function cur(c){ return {SEK:"크로나",GBP:"파운드",EUR:"유로",USD:"달러",KRW:"원"}[c]||c; }
+  function pctSpan(label, p, basis){ var s=el("span",cls(p), label+" "+pct(p)+(basis==="stated"?" *":"")); return s; }
+
+  function renderHead(){
+    document.getElementById("sub").textContent = D.as_of+" 기준 · "+D.price_basis_ko;
+    var from=new Date(D.as_of+"T00:00:00"), to=new Date(from.getTime()+14*864e5), rows=[];
+    D.holdings.forEach(function(h){ (h.events||[]).forEach(function(e){ if(!e.date) return; var d=new Date(e.date+"T00:00:00"); if(d>=from&&d<=to) rows.push({d:e.date,h:h,e:e}); }); });
+    rows.sort(function(a,b){ return a.d<b.d?-1:(a.d>b.d?1:0); });
+    var ul=document.getElementById("soon-list"); ul.textContent="";
+    rows.forEach(function(r){ var li=el("li"); add(li, el("span","d",md(r.d)));
+      var w=el("span","w"); add(w, el("b",null,r.h.name_ko+" "), document.createTextNode((r.e.short_ko||r.e.what_ko)+" "), el("span","tag"+(r.e.confirmed?"":" est"), r.e.confirmed?"확정":"예상")); add(li,w); ul.appendChild(li); });
+    document.getElementById("soon").hidden = rows.length===0;
+  }
+
+  function renderMarket(){
+    var P=document.getElementById("p-market"), M=D.market; P.textContent="";
+    var s1=el("section","sec"); add(s1, el("h2",null,"코스피 · 미국 3대 지수"));
+    var g=el("div","grid");
+    M.indices.forEach(function(i){ var c=el("div","card"); add(c, el("div","k",i.name_ko), el("div","v",fmt(i.last_close,2)));
+      var r=el("div","rows"); add(r, pctSpan("하루",i.pct_1d), pctSpan("주간",i.pct_1w), pctSpan("월간",i.pct_1m)); add(c,r);
+      var f=el("div","foot"); f.textContent="종가 "+i.last_close_date+" · 비교: 주간 "+(i.close_1w_date||"—")+", 월간 "+(i.close_1m!==null?i.close_1m_date:"확인 못 함")+" · "; add(f, link("출처",i.source_url)); add(c,f); g.appendChild(c); });
+    add(s1,g); P.appendChild(s1);
+
+    var s2=el("section","sec"); add(s2, el("h2",null,"환율 · 통화 1단위당 원화"));
+    g=el("div","grid");
+    M.fx.forEach(function(f){ var c=el("div","card"); add(c, el("div","k",f.name_ko), el("div","v",fmt(f.krw_per_unit,2)+" 원"));
+      var r=el("div","rows"); if(f.basis==="market") add(r, pctSpan("하루",f.pct_1d)); else add(r, el("span","flat","하루 변화 확인 못 함")); add(c,r);
+      var ft=el("div","foot"); ft.textContent=(f.as_of||"")+" · "+(f.rate_type_ko||"")+" "; if(f.source_url) add(ft, link("출처",f.source_url)); add(c,ft); g.appendChild(c); });
+    add(s2,g); P.appendChild(s2);
+
+    var s3=el("section","sec"); add(s3, el("h2",null,"10년물 국채 금리"));
+    g=el("div","grid");
+    M.yields.forEach(function(y){ var c=el("div","card"); add(c, el("div","k",y.name_ko), el("div","v", y.value_pct===null?"확인 못 함":fmt(y.value_pct,3)+"%"));
+      var r=el("div","rows"); if(y.chg_pp!==null&&y.chg_pp!==undefined) add(r, el("span",cls(y.chg_pp),"하루 "+(y.chg_pp>0?"▲ +":"▼ ")+fmt(y.chg_pp,3)+"%p")); add(c,r);
+      var ft=el("div","foot"); ft.textContent=(y.value_pct===null?(y.note||""):("기준 "+y.as_of+" · ")); if(y.source_url) add(ft, link("출처",y.source_url)); add(c,ft); g.appendChild(c); });
+    add(s3,g); add(s3, el("p","small muted","금리 0.01%p = 1bp입니다. 금리가 오르면 이미 발행된 채권 가격은 내려갑니다.")); P.appendChild(s3);
+
+    var s4=el("section","sec"); add(s4, el("h2",null,"전일 시황 · 가장 최근 마감한 장"));
+    M.recap.forEach(function(x){ var b=el("div","recap"); add(b, el("h3",null,x.market_ko+": "+x.title_ko), el("p",null,x.body_ko));
+      var ft=el("div","small muted"); ft.textContent=x.session_date+" · "+x.source_name+" "; add(ft, link("출처",x.source_url)); add(b,ft); s4.appendChild(b); });
+    P.appendChild(s4);
+    if(D.gaps_ko&&D.gaps_ko.length){ var n=el("div","note"); add(n, el("b",null,"오늘 확인하지 못한 것 ")); n.appendChild(document.createTextNode(D.gaps_ko.join(" · "))); P.appendChild(n); }
+  }
+
+  function companies(){ return D.holdings.filter(function(h){ return h.kind==="기업"; }); }
+  function matches(h){ if(region!=="전체"&&h.region!==region) return false; if(!query) return true; var q=query.toLowerCase(); return (h.name_ko+" "+h.ticker).toLowerCase().indexOf(q)>=0; }
+
+  function controls(panelKey, rerender){
+    var c=el("div","controls");
+    ["전체","유럽","미국"].forEach(function(r){ var b=el("button","chip",r); b.type="button"; b.setAttribute("aria-pressed", String(region===r)); b.addEventListener("click", function(){ region=r; rerender(); }); c.appendChild(b); });
+    var inp=el("input"); inp.type="search"; inp.id="q-"+panelKey; inp.placeholder="기업 이름 찾기"; inp.value=query; inp.setAttribute("aria-label","기업 이름 찾기");
+    inp.addEventListener("input", function(){ query=inp.value.trim(); rerender(true); }); c.appendChild(inp);
+    return c;
+  }
+  function jump(panelKey, list){ var c=el("div","controls"); list.forEach(function(h){ var a=el("a","chip",h.name_ko); a.href="#"+panelKey+"-"+h.key; a.addEventListener("click", function(ev){ ev.preventDefault(); var t=document.getElementById(panelKey+"-"+h.key); if(t){ if(t.tagName==="DETAILS") t.open=true; t.scrollIntoView({behavior:"smooth",block:"start"}); } }); c.appendChild(a); }); return c; }
+
+  function renderNews(keepFocus){
+    var P=document.getElementById("p-news"); P.textContent="";
+    var s=el("section","sec"); add(s, el("h2",null,"기업 뉴스·일정"), el("p","small muted","뉴스는 한글로 풀어 썼고 원문은 출처 링크에 있습니다. 호재·악재 표시는 그 소식 자체의 방향이고, 사고팔라는 뜻이 아닙니다."));
+    add(s, controls("news", renderNews)); var list=companies().filter(matches); add(s, jump("news", list)); P.appendChild(s);
+    if(!list.length) P.appendChild(el("p","muted","조건에 맞는 기업이 없습니다."));
+    list.forEach(function(h){ var c=el("article","co"); c.id="news-"+h.key;
+      var hh=el("div","co-h"); add(hh, el("h3",null,h.name_ko), el("span","tk",h.ticker), el("span","wt","비중 "+fmt(h.weight,2)+"%")); add(c,hh, el("p","small muted",h.one_line_ko));
+      var evs=(h.events||[]).filter(function(e){ return !e.date||e.date>=D.as_of; });
+      var b1=el("div"); add(b1, el("div","sub-h","예정 일정"));
+      if(evs.length){ var ul=el("ul","ev"); evs.forEach(function(e){ var li=el("li"); add(li, el("span","d",e.date?md(e.date):"날짜 미정")); var w=el("span"); w.appendChild(document.createTextNode(e.what_ko+" ")); add(w, el("span","tag"+(e.confirmed?"":" est"), e.confirmed?"확정":"예상"), document.createTextNode(" "), e.source_url?link("출처",e.source_url):null); add(li,w); ul.appendChild(li); }); add(b1,ul); }
+      else add(b1, el("p","small muted","확인된 일정이 없습니다."));
+      add(c,b1);
+      var b2=el("div"); add(b2, el("div","sub-h","최근 소식"));
+      if(h.news.length){ var nl=el("ul","nw"); h.news.forEach(function(n){ var li=el("li"); var top=el("div","top");
+          add(top, el("span","d",n.date), el("span","tone"+(n.tone==="호재"?" good":(n.tone==="악재"?" bad":"")), n.tone), el("span","hl",n.headline_ko)); add(li, top, el("p",null,n.summary_ko));
+          var ft=el("div","small muted"); ft.textContent=n.source_name+" "; add(ft, link("원문",n.url)); add(li,ft); nl.appendChild(li); }); add(b2,nl); }
+      else add(b2, el("p","small muted","최근 2주 안에 확인된 소식이 없습니다."));
+      add(c,b2); P.appendChild(c); });
+    if(keepFocus){ var i=document.getElementById("q-news"); if(i){ i.focus(); i.setSelectionRange(i.value.length,i.value.length); } }
+  }
+
+  function tint(p){ if(p===null||p===undefined) return ""; var a=Math.min(Math.abs(p)/6,1)*0.5+0.12; return "color-mix(in srgb, var(--"+(p>=0?"up":"down")+") "+Math.round(a*100)+"%, var(--panel))"; }
+  function valCell(h){ var td=el("td","val"); var v=h.valuation;
+    if(!v){ td.textContent="ETF는 해당 없음"; td.className="val muted"; return td; }
+    if(v.display_ko){ td.textContent=v.display_ko+" "; if(v.source_url) add(td, link("출처",v.source_url)); return td; }
+    if(v.current!==null&&v.average!==null){ td.appendChild(document.createTextNode("PER "+fmt(v.current,1)+"배 · "+(v.avg_label||"평균")+" "+fmt(v.average,1)+"배 "));
+      add(td, el("span","tag", "평균보다 "+fmt(Math.abs(v.gap_pct),0)+"% "+(v.gap_pct>=0?"높음":"낮음"))); }
+    else if(v.current!==null){ td.textContent="PER "+fmt(v.current,1)+"배 · 평균은 확인 못 함 "; }
+    else { td.textContent="확인 못 함 "; td.className="val muted"; }
+    if(v.caveat_ko) add(td, el("div","sm",v.caveat_ko)); if(v.source_url){ td.appendChild(document.createTextNode(" ")); add(td, link("출처",v.source_url)); }
+    return td; }
+
+  function renderPrice(){
+    var P=document.getElementById("p-price"); P.textContent="";
+    var s=el("section","sec"); add(s, el("h2",null,"한눈에 보기"));
+    var c=el("div","controls"); [["pct_1d","하루"],["pct_1w","주간"],["pct_1m","월간"]].forEach(function(x){ var b=el("button","chip",x[1]); b.type="button"; b.setAttribute("aria-pressed", String(period===x[0])); b.addEventListener("click", function(){ period=x[0]; renderPrice(); }); c.appendChild(b); }); add(s,c);
+    var hm=el("div","heat"); D.holdings.forEach(function(h){ var p=h.price[period]; var t=el("div","tile"); var bg=tint(p); if(bg) t.style.background=bg;
+      add(t, el("div","n",h.name_ko), el("div","p "+cls(p), p===null||p===undefined?"확인 못 함":pct(p)), el("div","w","비중 "+fmt(h.weight,2)+"%")); hm.appendChild(t); }); add(s,hm); P.appendChild(s);
+
+    var movers=D.holdings.filter(function(h){ return h.move_note_ko; });
+    if(movers.length){ var sm0=el("section","sec"); add(sm0, el("h2",null,"크게 움직인 종목, 왜 움직였나"), el("p","small muted","확인된 근거만 적었습니다. 이유를 못 찾은 종목은 못 찾았다고 적었습니다."));
+      var ml=el("ul","mv"); movers.forEach(function(h){ var li=el("li"), top=el("div","top"); add(top, el("b",null,h.name_ko), pctSpan("주간",h.price.pct_1w,h.price.pct_1w_basis), pctSpan("월간",h.price.pct_1m,h.price.pct_1m_basis)); top.lastChild.classList.add("num"); top.children[1].classList.add("num"); add(li, top, el("p",null,h.move_note_ko)); ml.appendChild(li); }); add(sm0,ml); P.appendChild(sm0); }
+    var s2=el("section","sec"); add(s2, el("h2",null,"종목별 가격"));
+    var sc=el("div","scroll"), tb=el("table"), thead=el("thead"), tr=el("tr");
+    [["종목","l"],["비중",""],["종가",""],["하루",""],["주간",""],["월간",""],["평소 대비 가격 수준","l"]].forEach(function(x){ var th=el("th",x[1],x[0]); th.scope="col"; tr.appendChild(th); }); add(thead,tr); add(tb,thead);
+    var body=el("tbody"); D.holdings.forEach(function(h){ var r=el("tr"), p=h.price; var td=el("td","l"); add(td, el("div","nm",h.name_ko), el("div","sm",h.ticker+" · "+h.kind)); r.appendChild(td);
+      r.appendChild(el("td","num",fmt(h.weight,2)+"%"));
+      var pc=el("td","num"); add(pc, el("div",null,auto(p.last_close)+" "+cur(h.currency)), el("div","sm",p.last_close_date||"")); r.appendChild(pc);
+      [["pct_1d",null],["pct_1w","pct_1w_basis"],["pct_1m","pct_1m_basis"]].forEach(function(k){ var v=p[k[0]]; var t=el("td","num "+cls(v), (v===null||v===undefined)?"확인 못 함":pct(v)+(k[1]&&p[k[1]]==="stated"?" *":"")); r.appendChild(t); });
+      r.appendChild(valCell(h)); body.appendChild(r); });
+    var cr=el("tr"); var c1=el("td","l"); add(c1, el("div","nm","현금"), el("div","sm","종목이 아닙니다")); add(cr,c1, el("td","num",fmt(D.portfolio.cash_pct,2)+"%")); for(var i=0;i<4;i++) cr.appendChild(el("td","num flat","—")); cr.appendChild(el("td","val muted","")); body.appendChild(cr);
+    add(tb,body); add(sc,tb); add(s2,sc);
+    var pl=el("div","plain"); add(pl, el("div",null,"종목 "+fmt(D.portfolio.stocks_pct,2)+"% + 현금 "+fmt(D.portfolio.cash_pct,2)+"% = 100%. "+D.portfolio.note_ko), el("div",null,"주간은 10월 1일 종가, 월간은 9월 8일 종가와 비교했습니다(그날 종가를 못 찾은 종목은 가장 가까운 날). * 표시는 직접 계산한 값이 아니라 시세 사이트가 밝힌 수익률을 그대로 옮긴 것입니다."), el("div",null,"'평소 대비 가격 수준'은 지금 PER(주가 ÷ 최근 12개월 주당순이익)을 과거 평균과 나란히 놓은 참고값입니다. 싸다, 비싸다는 판단이 아닙니다. 사이트마다 계산이 조금씩 달라 출처를 함께 적었습니다."));
+    add(s2,pl); P.appendChild(s2);
+    var dt=el("details"), sm=el("summary",null,"가격을 어디서 어떻게 확인했는지 보기"); add(dt,sm); var pb=el("div","plain");
+    D.holdings.forEach(function(h){ var row=el("div"); add(row, el("b",null,h.name_ko+" "), document.createTextNode((h.price.note||"")+" "), h.price.source_url?link(h.price.source_name||"출처",h.price.source_url):null); pb.appendChild(row); }); add(dt,pb); P.appendChild(dt);
+  }
+
+  function renderCalls(keepFocus){
+    var P=document.getElementById("p-calls"); P.textContent="";
+    var s=el("section","sec"); add(s, el("h2",null,"실적 콜 핵심"), el("p","small muted","가장 최근 실적 발표에서 회사가 한 말을 쉬운 말로 풀었습니다. 새 실적이 나오면 그 기업만 다시 씁니다."));
+    add(s, controls("calls", renderCalls)); var list=companies().filter(matches); add(s, jump("calls", list)); P.appendChild(s);
+    if(!list.length) P.appendChild(el("p","muted","조건에 맞는 기업이 없습니다."));
+    list.forEach(function(h, idx){ var e=h.earnings_call; if(!e) return; var d=el("details"); d.id="calls-"+h.key; d.className="co-d"; d.style.scrollMarginTop="76px"; if(idx===0) d.open=true;
+      var sm=el("summary"); add(sm, el("h3",null,h.name_ko), el("span","wt","비중 "+fmt(h.weight,2)+"%"), el("span","small muted",e.period_ko+" · 발표 "+e.published_date)); add(d,sm);
+      var b=el("div","call");
+      e.key_points.forEach(function(k){ var pt=el("div","pt"); add(pt, el("h4",null,k.title_ko), el("p",null,k.body_ko)); b.appendChild(pt); });
+      var a=el("div","pt"); add(a, el("div","sub-h","지난번에서 이어진 것"), el("p",null,e.carried_over_ko)); b.appendChild(a);
+      var n=el("div","pt"); add(n, el("div","sub-h","다음에 확인할 것")); var ul=el("ul"); e.next_to_check_ko.forEach(function(x){ ul.appendChild(el("li",null,x)); }); add(n,ul); b.appendChild(n);
+      var r=el("div","pt"); add(r, el("div","sub-h","반대 근거와 위험")); ul=el("ul"); e.risks_ko.forEach(function(x){ ul.appendChild(el("li",null,x)); }); add(r,ul); b.appendChild(r);
+      var so=el("div","small muted"); so.appendChild(document.createTextNode("근거 자료: ")); e.sources.forEach(function(x,i){ if(i) so.appendChild(document.createTextNode(" · ")); so.appendChild(link(x.name,x.url)); }); b.appendChild(so);
+      add(d,b); P.appendChild(d); });
+    if(keepFocus){ var i=document.getElementById("q-calls"); if(i){ i.focus(); i.setSelectionRange(i.value.length,i.value.length); } }
+  }
+
+  function show(tab, scroll){
+    if(TABS.indexOf(tab)<0) tab="market";
+    TABS.forEach(function(t){ document.getElementById("p-"+t).hidden = t!==tab; document.getElementById("t-"+t).setAttribute("aria-selected", String(t===tab)); });
+    try{ localStorage.setItem("cb-tab", tab); }catch(e){}
+    if(scroll){ try{ history.replaceState(null,"","#"+tab); }catch(e){} }
+  }
+  function start(){
+    renderHead(); renderMarket(); renderNews(); renderPrice(); renderCalls();
+    var t=(location.hash||"").replace("#",""); if(TABS.indexOf(t)<0){ try{ t=localStorage.getItem("cb-tab")||"market"; }catch(e){ t="market"; } }
+    show(t,false);
+    TABS.forEach(function(k){ document.getElementById("t-"+k).addEventListener("click", function(){ show(k,true); }); });
+  }
+  fetch("data.json").then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }).then(function(j){ D=j; start(); })
+    .catch(function(){ var m=document.querySelector("main"); m.textContent=""; var b=el("div","err"); b.textContent="자료를 불러오지 못했습니다. 페이지를 새로 고쳐 보세요. 계속 안 되면 Claude에게 '기업 현황판이 안 열린다'고 알려 주세요."; m.appendChild(b); document.getElementById("sub").textContent=""; });
+})();
+</script>
+
+</body></html>
