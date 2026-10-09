@@ -113,6 +113,11 @@ details[open]>summary::before{content:"–"}
 .lb.good{color:var(--up);background:var(--up-bg)}
 .lb.bad{color:var(--down);background:var(--down-bg)}
 .lb.watch{color:var(--warn);background:var(--warn-bg)}
+.lb.worry{color:var(--ink);background:var(--soft)}
+.lb.int{color:var(--accent);background:color-mix(in srgb, var(--accent) 14%, var(--panel))}
+.qa{display:grid;gap:10px}
+.qa .q{font-weight:600;font-size:14px}
+.qa .a{font-size:14px}
 .brief details{border:0;background:transparent}
 .brief details>summary{padding:4px 0;font-size:13.5px;color:var(--accent)}
 .brief .call{padding:6px 0 0 0}
@@ -280,7 +285,7 @@ details[open]>summary::before{content:"–"}
   function line(lbl, cls2, text){ var li=el("li"); add(li, el("span","lb "+cls2,lbl), el("span",null,text)); return li; }
   function renderCalls(keepFocus){
     var P=document.getElementById("p-calls"); P.textContent="";
-    var s=el("section","sec"); add(s, el("h2",null,"실적 콜 핵심"), el("p","small muted","기업마다 큰 그림, 좋았던 점, 아쉬운 점, 앞으로 볼 것만 먼저 보여 드립니다. 더 보고 싶으면 '자세히 보기'를 누릅니다."), lightNote());
+    var s=el("section","sec"); add(s, el("h2",null,"실적 콜 핵심"), el("p","small muted","기업마다 큰 그림, 좋았던 점, 아쉬운 점, 콜에서 나온 걱정과 관심, 앞으로 볼 것만 먼저 보여 드립니다. 더 보고 싶으면 '자세히 보기'를 누릅니다."), lightNote());
     add(s, controls("calls", renderCalls)); var list=companies().filter(matches); add(s, jump("calls", list)); P.appendChild(s);
     if(!list.length) P.appendChild(el("p","muted","조건에 맞는 기업이 없습니다."));
     list.forEach(function(h){ var e=h.earnings_call; if(!e) return; var c=el("article","brief"); c.id="calls-"+h.key;
@@ -289,10 +294,18 @@ details[open]>summary::before{content:"–"}
       if(B){ add(c, el("p","big",B.big_ko)); var ul=el("ul");
         (B.good_ko||[]).forEach(function(x){ ul.appendChild(line("좋았던 점","good",x)); });
         (B.bad_ko||[]).forEach(function(x){ ul.appendChild(line("아쉬운 점","bad",x)); });
+        var Q=(e.call_qa&&e.call_qa.found_transcript)?e.call_qa:{};
+        (Q.concerns_ko||[]).slice(0,1).forEach(function(x){ ul.appendChild(line("콜 걱정","worry",x)); });
+        (Q.interests_ko||[]).slice(0,1).forEach(function(x){ ul.appendChild(line("콜 관심","int",x)); });
         (B.watch_ko||[]).forEach(function(x){ ul.appendChild(line("앞으로","watch",x)); });
         add(c, ul); }
       var d=el("details"); add(d, el("summary",null,B?"자세히 보기":"내용 보기"));
       var b=el("div","call");
+      if(e.call_qa&&e.call_qa.qa&&e.call_qa.qa.length){ var qs=el("div","pt"); add(qs, el("div","sub-h",e.call_qa.found_transcript?"콜에서 나온 질문과 답":"주요 걱정과 관심 (콜 질의응답 원문은 못 찾아 회사 발표 기준)"));
+        if(e.call_qa.basis_ko) add(qs, el("p","small muted",e.call_qa.basis_ko));
+        var qw=el("div","qa"); e.call_qa.qa.forEach(function(x){ var it=el("div"); add(it, el("div","q",(x.topic_ko?"["+x.topic_ko+"] ":"")+x.q_ko), el("div","a",x.a_ko)); qw.appendChild(it); }); add(qs,qw);
+        if(e.call_qa.sources&&e.call_qa.sources.length){ var qso=el("div","small muted"); qso.appendChild(document.createTextNode("질의응답 출처: ")); e.call_qa.sources.forEach(function(x,i){ if(i) qso.appendChild(document.createTextNode(" · ")); qso.appendChild(link(x.name,x.url)); }); add(qs,qso); }
+        b.appendChild(qs); }
       e.key_points.forEach(function(k){ var pt=el("div","pt"); add(pt, el("h4",null,k.title_ko), el("p",null,k.body_ko)); b.appendChild(pt); });
       var a=el("div","pt"); add(a, el("div","sub-h","지난번에서 이어진 것"), el("p",null,e.carried_over_ko)); b.appendChild(a);
       var n=el("div","pt"); add(n, el("div","sub-h","다음에 확인할 것")); var ul2=el("ul"); e.next_to_check_ko.forEach(function(x){ ul2.appendChild(el("li",null,x)); }); add(n,ul2); b.appendChild(n);
