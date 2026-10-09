@@ -102,6 +102,20 @@ details[open]>summary::before{content:"–"}
 .pt{display:flex;flex-direction:column;gap:2px}
 .note{background:var(--warn-bg);color:var(--ink);border-radius:8px;padding:12px 14px;font-size:13.5px}
 .note b{color:var(--warn)}
+.gaps>summary{font-size:13.5px;color:var(--muted);padding:10px 16px}
+.gaps ul{margin:0;padding:0 18px 12px 38px;font-size:13px;color:var(--muted);display:grid;gap:4px}
+.brief{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;scroll-margin-top:76px}
+.brief .big{font-weight:600;font-size:15.5px;max-width:72ch}
+.brief ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.brief li{display:grid;grid-template-columns:64px 1fr;gap:8px;align-items:baseline;font-size:14px}
+.brief li span:last-child{max-width:68ch}
+.lb{font-size:12px;font-weight:600;padding:1px 0;border-radius:999px;text-align:center;white-space:nowrap}
+.lb.good{color:var(--up);background:var(--up-bg)}
+.lb.bad{color:var(--down);background:var(--down-bg)}
+.lb.watch{color:var(--warn);background:var(--warn-bg)}
+.brief details{border:0;background:transparent}
+.brief details>summary{padding:4px 0;font-size:13.5px;color:var(--accent)}
+.brief .call{padding:6px 0 0 0}
 .plain{padding:14px 18px;font-size:13px;color:var(--muted);display:grid;gap:6px}
 .err{padding:24px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
 @media (max-width:560px){
@@ -189,10 +203,11 @@ details[open]>summary::before{content:"–"}
     M.recap.forEach(function(x){ var b=el("div","recap"); add(b, el("h3",null,x.market_ko+": "+x.title_ko), el("p",null,x.body_ko));
       var ft=el("div","small muted"); ft.textContent=x.session_date+" · "+x.source_name+" "; add(ft, link("출처",x.source_url)); add(b,ft); s4.appendChild(b); });
     P.appendChild(s4);
-    if(D.gaps_ko&&D.gaps_ko.length){ var n=el("div","note"); add(n, el("b",null,"오늘 확인하지 못한 것 ")); n.appendChild(document.createTextNode(D.gaps_ko.join(" · "))); P.appendChild(n); }
+    if(D.gaps_ko&&D.gaps_ko.length){ var n=el("details","gaps"); add(n, el("summary",null,"오늘 못 채운 것 "+D.gaps_ko.length+"개")); var gl=el("ul"); D.gaps_ko.forEach(function(x){ gl.appendChild(el("li",null,x)); }); add(n,gl); P.appendChild(n); }
   }
 
-  function companies(){ return D.holdings.filter(function(h){ return h.kind==="기업"; }); }
+  function companies(){ return D.holdings.filter(function(h){ return h.kind==="기업"&&!h.light; }); }
+  function lightNote(){ var l=D.holdings.filter(function(h){ return h.light; }); if(!l.length) return null; return el("p","small muted",l.map(function(h){ return h.name_ko; }).join(", ")+"는 비중이 작아 가격과 실적 날짜만 봅니다."); }
   function matches(h){ if(region!=="전체"&&h.region!==region) return false; if(!query) return true; var q=query.toLowerCase(); return (h.name_ko+" "+h.ticker).toLowerCase().indexOf(q)>=0; }
 
   function controls(panelKey, rerender){
@@ -207,7 +222,7 @@ details[open]>summary::before{content:"–"}
   function renderNews(keepFocus){
     var P=document.getElementById("p-news"); P.textContent="";
     var s=el("section","sec"); add(s, el("h2",null,"기업 뉴스·일정"), el("p","small muted","뉴스는 한글로 풀어 썼고 원문은 출처 링크에 있습니다. 호재·악재 표시는 그 소식 자체의 방향이고, 사고팔라는 뜻이 아닙니다."));
-    add(s, controls("news", renderNews)); var list=companies().filter(matches); add(s, jump("news", list)); P.appendChild(s);
+    add(s, lightNote(), controls("news", renderNews)); var list=companies().filter(matches); add(s, jump("news", list)); P.appendChild(s);
     if(!list.length) P.appendChild(el("p","muted","조건에 맞는 기업이 없습니다."));
     list.forEach(function(h){ var c=el("article","co"); c.id="news-"+h.key;
       var hh=el("div","co-h"); add(hh, el("h3",null,h.name_ko), el("span","tk",h.ticker), el("span","wt","비중 "+fmt(h.weight,2)+"%")); add(c,hh, el("p","small muted",h.one_line_ko));
@@ -243,7 +258,7 @@ details[open]>summary::before{content:"–"}
     var hm=el("div","heat"); D.holdings.forEach(function(h){ var p=h.price[period]; var t=el("div","tile"); var bg=tint(p); if(bg) t.style.background=bg;
       add(t, el("div","n",h.name_ko), el("div","p "+cls(p), p===null||p===undefined?"확인 못 함":pct(p)), el("div","w","비중 "+fmt(h.weight,2)+"%")); hm.appendChild(t); }); add(s,hm); P.appendChild(s);
 
-    var movers=D.holdings.filter(function(h){ return h.move_note_ko; });
+    var movers=D.holdings.filter(function(h){ return h.move_note_ko&&h.kind!=="ETF"&&!h.light; });
     if(movers.length){ var sm0=el("section","sec"); add(sm0, el("h2",null,"크게 움직인 종목, 왜 움직였나"), el("p","small muted","확인된 근거만 적었습니다. 이유를 못 찾은 종목은 못 찾았다고 적었습니다."));
       var ml=el("ul","mv"); movers.forEach(function(h){ var li=el("li"), top=el("div","top"); add(top, el("b",null,h.name_ko), pctSpan("주간",h.price.pct_1w,h.price.pct_1w_basis), pctSpan("월간",h.price.pct_1m,h.price.pct_1m_basis)); top.lastChild.classList.add("num"); top.children[1].classList.add("num"); add(li, top, el("p",null,h.move_note_ko)); ml.appendChild(li); }); add(sm0,ml); P.appendChild(sm0); }
     var s2=el("section","sec"); add(s2, el("h2",null,"종목별 가격"));
@@ -262,20 +277,28 @@ details[open]>summary::before{content:"–"}
     D.holdings.forEach(function(h){ var row=el("div"); add(row, el("b",null,h.name_ko+" "), document.createTextNode((h.price.note||"")+" "), h.price.source_url?link(h.price.source_name||"출처",h.price.source_url):null); pb.appendChild(row); }); add(dt,pb); P.appendChild(dt);
   }
 
+  function line(lbl, cls2, text){ var li=el("li"); add(li, el("span","lb "+cls2,lbl), el("span",null,text)); return li; }
   function renderCalls(keepFocus){
     var P=document.getElementById("p-calls"); P.textContent="";
-    var s=el("section","sec"); add(s, el("h2",null,"실적 콜 핵심"), el("p","small muted","가장 최근 실적 발표에서 회사가 한 말을 쉬운 말로 풀었습니다. 새 실적이 나오면 그 기업만 다시 씁니다."));
+    var s=el("section","sec"); add(s, el("h2",null,"실적 콜 핵심"), el("p","small muted","기업마다 큰 그림, 좋았던 점, 아쉬운 점, 앞으로 볼 것만 먼저 보여 드립니다. 더 보고 싶으면 '자세히 보기'를 누릅니다."), lightNote());
     add(s, controls("calls", renderCalls)); var list=companies().filter(matches); add(s, jump("calls", list)); P.appendChild(s);
     if(!list.length) P.appendChild(el("p","muted","조건에 맞는 기업이 없습니다."));
-    list.forEach(function(h, idx){ var e=h.earnings_call; if(!e) return; var d=el("details"); d.id="calls-"+h.key; d.className="co-d"; d.style.scrollMarginTop="76px"; if(idx===0) d.open=true;
-      var sm=el("summary"); add(sm, el("h3",null,h.name_ko), el("span","wt","비중 "+fmt(h.weight,2)+"%"), el("span","small muted",e.period_ko+" · 발표 "+e.published_date)); add(d,sm);
+    list.forEach(function(h){ var e=h.earnings_call; if(!e) return; var c=el("article","brief"); c.id="calls-"+h.key;
+      var hh=el("div","co-h"); add(hh, el("h3",null,h.name_ko), el("span","wt","비중 "+fmt(h.weight,2)+"%"), el("span","small muted",e.period_ko.split(/[(.—]/)[0].trim()+" · 발표 "+e.published_date)); add(c,hh);
+      var B=e.brief;
+      if(B){ add(c, el("p","big",B.big_ko)); var ul=el("ul");
+        (B.good_ko||[]).forEach(function(x){ ul.appendChild(line("좋았던 점","good",x)); });
+        (B.bad_ko||[]).forEach(function(x){ ul.appendChild(line("아쉬운 점","bad",x)); });
+        (B.watch_ko||[]).forEach(function(x){ ul.appendChild(line("앞으로","watch",x)); });
+        add(c, ul); }
+      var d=el("details"); add(d, el("summary",null,B?"자세히 보기":"내용 보기"));
       var b=el("div","call");
       e.key_points.forEach(function(k){ var pt=el("div","pt"); add(pt, el("h4",null,k.title_ko), el("p",null,k.body_ko)); b.appendChild(pt); });
       var a=el("div","pt"); add(a, el("div","sub-h","지난번에서 이어진 것"), el("p",null,e.carried_over_ko)); b.appendChild(a);
-      var n=el("div","pt"); add(n, el("div","sub-h","다음에 확인할 것")); var ul=el("ul"); e.next_to_check_ko.forEach(function(x){ ul.appendChild(el("li",null,x)); }); add(n,ul); b.appendChild(n);
-      var r=el("div","pt"); add(r, el("div","sub-h","반대 근거와 위험")); ul=el("ul"); e.risks_ko.forEach(function(x){ ul.appendChild(el("li",null,x)); }); add(r,ul); b.appendChild(r);
+      var n=el("div","pt"); add(n, el("div","sub-h","다음에 확인할 것")); var ul2=el("ul"); e.next_to_check_ko.forEach(function(x){ ul2.appendChild(el("li",null,x)); }); add(n,ul2); b.appendChild(n);
+      var r=el("div","pt"); add(r, el("div","sub-h","반대 근거와 위험")); ul2=el("ul"); e.risks_ko.forEach(function(x){ ul2.appendChild(el("li",null,x)); }); add(r,ul2); b.appendChild(r);
       var so=el("div","small muted"); so.appendChild(document.createTextNode("근거 자료: ")); e.sources.forEach(function(x,i){ if(i) so.appendChild(document.createTextNode(" · ")); so.appendChild(link(x.name,x.url)); }); b.appendChild(so);
-      add(d,b); P.appendChild(d); });
+      add(d,b); add(c,d); P.appendChild(c); });
     if(keepFocus){ var i=document.getElementById("q-calls"); if(i){ i.focus(); i.setSelectionRange(i.value.length,i.value.length); } }
   }
 
