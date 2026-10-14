@@ -77,6 +77,7 @@ input[type=search]{font:inherit;font-size:14px;padding:7px 12px;border:1px solid
 .mv li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;gap:2px}
 .mv .top{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
 .mv p{max-width:72ch;font-size:14px}
+.hold{font-size:11.5px;font-weight:600;padding:1px 7px;border-radius:4px;background:color-mix(in srgb, var(--accent) 16%, var(--panel));color:var(--accent);margin-left:6px;white-space:nowrap}
 .tag.est{background:var(--warn-bg);color:var(--warn)}
 .heat{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px}
 .tile{border-radius:8px;padding:10px 12px;border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -211,7 +212,9 @@ details[open]>summary::before{content:"–"}
     if(D.gaps_ko&&D.gaps_ko.length){ var n=el("details","gaps"); add(n, el("summary",null,"오늘 못 채운 것 "+D.gaps_ko.length+"개")); var gl=el("ul"); D.gaps_ko.forEach(function(x){ gl.appendChild(el("li",null,x)); }); add(n,gl); P.appendChild(n); }
   }
 
-  function companies(){ return D.holdings.filter(function(h){ return h.kind==="기업"&&!h.light; }); }
+  function companies(){ return D.holdings.filter(function(h){ return h.kind==="기업"&&!h.light&&h.held!==false; }); }
+  function wt(h){ return h.weight===null||h.weight===undefined?"—":fmt(h.weight,2)+"%"; }
+  function nd(h,v){ return (v===null||v===undefined)?(h.price.no_data?"데이터 없음":"확인 못 함"):pct(v); }
   function lightNote(){ var l=D.holdings.filter(function(h){ return h.light; }); if(!l.length) return null; return el("p","small muted",l.map(function(h){ return h.name_ko; }).join(", ")+"는 비중이 작아 가격과 실적 날짜만 봅니다."); }
   function matches(h){ if(region!=="전체"&&h.region!==region) return false; if(!query) return true; var q=query.toLowerCase(); return (h.name_ko+" "+h.ticker).toLowerCase().indexOf(q)>=0; }
 
@@ -246,37 +249,38 @@ details[open]>summary::before{content:"–"}
   }
 
   function tint(p){ if(p===null||p===undefined) return ""; var a=Math.min(Math.abs(p)/6,1)*0.5+0.12; return "color-mix(in srgb, var(--"+(p>=0?"up":"down")+") "+Math.round(a*100)+"%, var(--panel))"; }
-  function valCell(h){ var td=el("td","val"); var v=h.valuation;
-    if(!v){ td.textContent="ETF는 해당 없음"; td.className="val muted"; return td; }
-    if(v.display_ko){ td.textContent=v.display_ko+" "; if(v.source_url) add(td, link("출처",v.source_url)); return td; }
-    if(v.current!==null&&v.average!==null){ td.appendChild(document.createTextNode("PER "+fmt(v.current,1)+"배 · "+(v.avg_label||"평균")+" "+fmt(v.average,1)+"배 "));
-      add(td, el("span","tag", "평균보다 "+fmt(Math.abs(v.gap_pct),0)+"% "+(v.gap_pct>=0?"높음":"낮음"))); }
-    else if(v.current!==null){ td.textContent="PER "+fmt(v.current,1)+"배 · 평균은 확인 못 함 "; }
-    else { td.textContent="확인 못 함 "; td.className="val muted"; }
-    if(v.caveat_ko) add(td, el("div","sm",v.caveat_ko)); if(v.source_url){ td.appendChild(document.createTextNode(" ")); add(td, link("출처",v.source_url)); }
-    return td; }
+  function fwdCells(h){ var f=h.fwd||{}, out=[], lp=h.price&&h.price.last_close, k=(f.base_price&&lp)?lp/f.base_price:1;
+    function avgLine(cur,avg,yrs,unit){ if(avg===null||avg===undefined) return null; var g=(cur/avg-1)*100; return el("div","sm",(yrs||5)+"년 평균"+(yrs===3?"*":"")+" "+fmt(avg,1)+unit+" · "+(g>=0?"+":"")+fmt(g,0)+"%"); }
+    var c1=el("td","num");
+    if(f.pe===null||f.pe===undefined){ c1.className="num flat"; add(c1, el("div",null,f.na_ko||"확인 못 함")); if(f.nav_ko) add(c1, el("div","sm",f.nav_ko)); }
+    else { var pe=f.pe*k; add(c1, el("div",null,fmt(pe,1)+"배"), avgLine(pe,f.avg,f.years,"배")); }
+    out.push(c1);
+    var c2=el("td","num");
+    if(f.fcf_yield===null||f.fcf_yield===undefined){ c2.className="num flat"; c2.textContent=f.na_ko&&f.pe==null?"—":"확인 못 함"; }
+    else { var y=f.fcf_yield/k; add(c2, el("div",null,fmt(y,1)+"%"), avgLine(y,f.fcf_avg,f.fcf_years||f.years,"%")); }
+    out.push(c2);
+    return out; }
 
   function renderPrice(){
     var P=document.getElementById("p-price"); P.textContent="";
     var s=el("section","sec"); add(s, el("h2",null,"한눈에 보기"));
     var c=el("div","controls"); [["pct_1d","하루"],["pct_1w","주간"],["pct_1m","월간"]].forEach(function(x){ var b=el("button","chip",x[1]); b.type="button"; b.setAttribute("aria-pressed", String(period===x[0])); b.addEventListener("click", function(){ period=x[0]; renderPrice(); }); c.appendChild(b); }); add(s,c);
     var hm=el("div","heat"); D.holdings.forEach(function(h){ var p=h.price[period]; var t=el("div","tile"); var bg=tint(p); if(bg) t.style.background=bg;
-      add(t, el("div","n",h.name_ko), el("div","p "+cls(p), p===null||p===undefined?"확인 못 함":pct(p)), el("div","w","비중 "+fmt(h.weight,2)+"%")); hm.appendChild(t); }); add(s,hm); P.appendChild(s);
+      add(t, el("div","n",h.name_ko), el("div","p "+cls(p), nd(h,p)), el("div","w",h.held?"보유 · 비중 "+wt(h):"")); hm.appendChild(t); }); add(s,hm); P.appendChild(s);
 
     var movers=D.holdings.filter(function(h){ return h.move_note_ko&&h.kind!=="ETF"&&!h.light; });
     if(movers.length){ var sm0=el("section","sec"); add(sm0, el("h2",null,"크게 움직인 종목, 왜 움직였나"), el("p","small muted","확인된 근거만 적었습니다. 이유를 못 찾은 종목은 못 찾았다고 적었습니다."));
       var ml=el("ul","mv"); movers.forEach(function(h){ var li=el("li"), top=el("div","top"); add(top, el("b",null,h.name_ko), pctSpan("주간",h.price.pct_1w,h.price.pct_1w_basis), pctSpan("월간",h.price.pct_1m,h.price.pct_1m_basis)); top.lastChild.classList.add("num"); top.children[1].classList.add("num"); add(li, top, el("p",null,h.move_note_ko)); ml.appendChild(li); }); add(sm0,ml); P.appendChild(sm0); }
     var s2=el("section","sec"); add(s2, el("h2",null,"종목별 가격"));
     var sc=el("div","scroll"), tb=el("table"), thead=el("thead"), tr=el("tr");
-    [["종목","l"],["비중",""],["종가",""],["하루",""],["주간",""],["월간",""],["평소 대비 가격 수준","l"]].forEach(function(x){ var th=el("th",x[1],x[0]); th.scope="col"; tr.appendChild(th); }); add(thead,tr); add(tb,thead);
-    var body=el("tbody"); D.holdings.forEach(function(h){ var r=el("tr"), p=h.price; var td=el("td","l"); add(td, el("div","nm",h.name_ko), el("div","sm",h.ticker+" · "+h.kind)); r.appendChild(td);
-      r.appendChild(el("td","num",fmt(h.weight,2)+"%"));
-      var pc=el("td","num"); add(pc, el("div",null,auto(p.last_close)+" "+cur(h.currency)), el("div","sm",p.last_close_date||"")); r.appendChild(pc);
-      [["pct_1d",null],["pct_1w","pct_1w_basis"],["pct_1m","pct_1m_basis"]].forEach(function(k){ var v=p[k[0]]; var t=el("td","num "+cls(v), (v===null||v===undefined)?"확인 못 함":pct(v)+(k[1]&&p[k[1]]==="stated"?" *":"")); r.appendChild(t); });
-      r.appendChild(valCell(h)); body.appendChild(r); });
-    var cr=el("tr"); var c1=el("td","l"); add(c1, el("div","nm","현금"), el("div","sm","종목이 아닙니다")); add(cr,c1, el("td","num",fmt(D.portfolio.cash_pct,2)+"%")); for(var i=0;i<4;i++) cr.appendChild(el("td","num flat","—")); cr.appendChild(el("td","val muted","")); body.appendChild(cr);
+    [["종목","l"],["비중",""],["종가",""],["하루",""],["주간",""],["월간",""],["포워드 PER",""],["FCF 수익률",""]].forEach(function(x){ var th=el("th",x[1],x[0]); th.scope="col"; tr.appendChild(th); }); add(thead,tr); add(tb,thead);
+    var body=el("tbody"); D.holdings.forEach(function(h){ var r=el("tr"), p=h.price; var td=el("td","l"); var nm=el("div","nm",h.name_ko); if(h.held) nm.appendChild(el("span","hold","보유")); add(td, nm, el("div","sm",h.ticker+" · "+cur(h.currency))); r.appendChild(td);
+      r.appendChild(el("td","num",wt(h)));
+      var pc=el("td","num"); if(p.no_data){ pc.className="num flat"; pc.textContent="데이터 없음"; } else add(pc, el("div",null,auto(p.last_close)+" "+cur(h.currency)), el("div","sm",p.last_close_date||"")); r.appendChild(pc);
+      [["pct_1d",null],["pct_1w","pct_1w_basis"],["pct_1m","pct_1m_basis"]].forEach(function(k){ var v=p[k[0]]; var t=el("td","num "+cls(v), (v===null||v===undefined)?nd(h,v):pct(v)+(k[1]&&p[k[1]]==="stated"?" *":"")); r.appendChild(t); });
+      fwdCells(h).forEach(function(x){ r.appendChild(x); }); body.appendChild(r); });
     add(tb,body); add(sc,tb); add(s2,sc);
-    var pl=el("div","plain"); add(pl, el("div",null,"종목 "+fmt(D.portfolio.stocks_pct,2)+"% + 현금 "+fmt(D.portfolio.cash_pct,2)+"% = 100%. "+D.portfolio.note_ko), el("div",null,"주간은 10월 1일 종가, 월간은 9월 8일 종가와 비교했습니다(그날 종가를 못 찾은 종목은 가장 가까운 날). * 표시는 직접 계산한 값이 아니라 시세 사이트가 밝힌 수익률을 그대로 옮긴 것입니다."), el("div",null,"'평소 대비 가격 수준'은 지금 PER(주가 ÷ 최근 12개월 주당순이익)을 과거 평균과 나란히 놓은 참고값입니다. 싸다, 비싸다는 판단이 아닙니다. 사이트마다 계산이 조금씩 달라 출처를 함께 적었습니다."));
+    var pl=el("div","plain"); add(pl, el("div",null,D.portfolio.note_ko+" 가격은 현지 통화 그대로이며 원화로 바꾸지 않았습니다."), el("div",null,"하루는 직전 거래일 종가, 주간은 1주 전, 월간은 1달 전 종가와 비교했습니다(그날 거래가 없으면 바로 앞 거래일). 종가 아래 날짜가 어제가 아니면 그 종목은 아직 새 종가를 받지 못한 것입니다."), el("div",null,"포워드 PER은 주가 ÷ 앞으로 12개월 예상 주당순이익, FCF 수익률은 앞으로 12개월 예상 잉여현금흐름 ÷ 시가총액입니다. 둘 다 매주 토요일 TIKR에서 읽고"+(D.fwd_as_of?" (마지막 "+D.fwd_as_of+")":"")+", 평일에는 그 뒤 주가 변화만 반영해 다시 계산합니다. 아래 줄은 과거 평균과 지금 값의 차이이며, 기본은 5년 평균이고 *는 적자였던 해가 있어 3년 평균을 쓴 것입니다."+(function(){ var u=(D.market&&D.market.yields||[]).filter(function(y){ return /미국/.test(y.name_ko); })[0]; return u&&u.value_pct!=null?" 견줘 볼 미국 10년 국채 금리는 "+fmt(u.value_pct,2)+"%입니다.":""; })()+" 싸다·비싸다는 판단이 아닙니다."));
     add(s2,pl); P.appendChild(s2);
     var dt=el("details"), sm=el("summary",null,"가격을 어디서 어떻게 확인했는지 보기"); add(dt,sm); var pb=el("div","plain");
     D.holdings.forEach(function(h){ var row=el("div"); add(row, el("b",null,h.name_ko+" "), document.createTextNode((h.price.note||"")+" "), h.price.source_url?link(h.price.source_name||"출처",h.price.source_url):null); pb.appendChild(row); }); add(dt,pb); P.appendChild(dt);
@@ -331,5 +335,6 @@ details[open]>summary::before{content:"–"}
     .catch(function(){ var m=document.querySelector("main"); m.textContent=""; var b=el("div","err"); b.textContent="자료를 불러오지 못했습니다. 페이지를 새로 고쳐 보세요. 계속 안 되면 Claude에게 '기업 현황판이 안 열린다'고 알려 주세요."; m.appendChild(b); document.getElementById("sub").textContent=""; });
 })();
 </script>
+
 
 </body></html>
