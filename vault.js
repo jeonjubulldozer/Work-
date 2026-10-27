@@ -39,9 +39,11 @@
     /* 현황판 화면: data.json 요청을 잠긴 파일을 푼 결과로 바꿔 줍니다. */
     window.fetch=function(input,init){
       var u=typeof input==="string"?input:((input&&input.url)||"");
-      if(/(^|\/)data\.json(\?|$)/.test(u)){
-        return open(u.replace(/data\.json.*/,"data.enc.json")).then(function(t){ return new Response(t,{status:200,headers:{"Content-Type":"application/json"}}); })
-          .catch(function(e){ if(e&&(e.code==="notpaired"||e.code==="nodata")) location.replace(home); throw e; });
+      var mm=/(^|\/)(data|listen)\.json(\?|$)/.exec(u);
+      if(mm){
+        var isData=mm[2]==="data";
+        return open(u.replace(/(data|listen)\.json.*/,"$1.enc.json")).then(function(t){ return new Response(t,{status:200,headers:{"Content-Type":"application/json"}}); })
+          .catch(function(e){ if(isData&&e&&(e.code==="notpaired"||e.code==="nodata")) location.replace(home); throw e; });
       }
       return fetch0(input,init);
     };

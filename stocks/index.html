@@ -3,7 +3,7 @@
 <title>기업 현황판</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* layout: one reading column, a sticky row of four tabs, cards that fall to one column on a phone */
+/* layout: one reading column, a sticky row of five tabs, cards that fall to one column on a phone */
 :root{
   --bg:#F3F5F7; --panel:#FFFFFF; --ink:#141A21; --muted:#5A6572; --line:#D9DFE6; --soft:#EAEEF2;
   --accent:#1E5248; --accent-ink:#FFFFFF; --up:#C5302B; --down:#1F55C2; --warn:#9A5B06; --warn-bg:#FBF1DD;
@@ -122,12 +122,60 @@ details[open]>summary::before{content:"–"}
 .brief details{border:0;background:transparent}
 .brief details>summary{padding:4px 0;font-size:13.5px;color:var(--accent)}
 .brief .call{padding:6px 0 0 0}
+/* 요약 카드의 라벨 줄(64px 칸) 규칙이 '자세히 보기' 안 목록까지 번지지 않게 되돌린다 */
+.brief .call ul{list-style:disc;padding-left:18px;display:grid;gap:6px}
+.brief .call li{display:list-item;font-size:14px;max-width:72ch}
 .plain{padding:14px 18px;font-size:13px;color:var(--muted);display:grid;gap:6px}
 .err{padding:24px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
 @media (max-width:560px){
   .wrap{padding-inline:16px} h1{font-size:23px} .tabs{grid-template-columns:repeat(2,1fr)} .call{padding-left:20px}
   .soon li,.ev li{grid-template-columns:1fr;gap:0}
 }
+/* 듣기 탭: 위에 재생 설정과 이어 듣기 버튼, 아래에 기업별 콜 원고와 한 달 동향 카드, 재생 중에는 화면 아래 고정 재생 막대 */
+.tabs{grid-template-columns:repeat(5,1fr)}
+.btn{font:inherit;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;line-height:1.3}
+.btn svg{width:14px;height:14px;flex:none;fill:currentColor}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:focus-visible,.mp button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn[disabled]{opacity:.5;cursor:default}
+.lis-top{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.lis-top .row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+.lis-top .lbl{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.04em;min-width:44px}
+.lis-top p{max-width:72ch}
+select{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);max-width:100%;min-width:0}
+.lis-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;scroll-margin-top:110px;min-width:0}
+.lis-card .meta{font-size:13px;color:var(--muted)}
+.lis-card .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lis-card details{border:0;background:transparent}
+.lis-card details>summary{padding:4px 0;font-size:13.5px;color:var(--accent)}
+.script{display:flex;flex-direction:column;gap:14px;padding-top:8px}
+.script section{display:flex;flex-direction:column;gap:8px}
+.script h4{font-size:13px;color:var(--muted);letter-spacing:.04em;margin:0}
+.script p,.lis-card .tp{max-width:72ch;font-size:14.5px;line-height:1.75;padding:2px 6px;margin:0 -6px;border-radius:6px;transition:background-color .2s}
+.now{background:color-mix(in srgb, var(--accent) 16%, var(--panel))}
+.lis-card .wk{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.lis-card .wk li{display:grid;grid-template-columns:76px 1fr;gap:10px;align-items:baseline;font-size:14px;padding:2px 6px;margin:0 -6px;border-radius:6px}
+.lis-card .wk .d{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.lis-card .src{font-size:12.5px;color:var(--muted)}
+.tag.nofull{background:var(--warn-bg);color:var(--warn)}
+.pend{font-size:13px;color:var(--muted)}
+.wrap.has-mp{padding-bottom:170px}
+.mp{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -6px 18px color-mix(in srgb, var(--ink) 10%, transparent);padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom, 0px));padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.mp .in{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.mp .t1{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp .t2{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp .ctl{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.mp button{font:inherit;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:42px;height:38px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.mp button svg{width:15px;height:15px;fill:currentColor}
+.mp button.main{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);min-width:54px}
+.mp .rate{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.mp .sp{flex:1}
+@media (max-width:560px){
+  .tabs{grid-template-columns:repeat(3,1fr)} .tab{padding:10px 4px;font-size:14px}
+  .lis-card .wk li{grid-template-columns:1fr;gap:0}
+  .mp button{min-width:38px;padding:0 8px}
+}
+@media (prefers-reduced-motion: reduce){ .script p,.lis-card .tp{transition:none} }
 </style>
 
 <div class="wrap">
@@ -147,6 +195,7 @@ details[open]>summary::before{content:"–"}
     <button class="tab" role="tab" id="t-news" data-tab="news" aria-selected="false">기업 뉴스·일정</button>
     <button class="tab" role="tab" id="t-price" data-tab="price" aria-selected="false">가격</button>
     <button class="tab" role="tab" id="t-calls" data-tab="calls" aria-selected="false">실적 콜</button>
+    <button class="tab" role="tab" id="t-listen" data-tab="listen" aria-selected="false">듣기</button>
   </nav>
 
   <main>
@@ -154,12 +203,13 @@ details[open]>summary::before{content:"–"}
     <div class="panel" id="p-news" role="tabpanel" aria-labelledby="t-news" hidden></div>
     <div class="panel" id="p-price" role="tabpanel" aria-labelledby="t-price" hidden></div>
     <div class="panel" id="p-calls" role="tabpanel" aria-labelledby="t-calls" hidden></div>
+    <div class="panel" id="p-listen" role="tabpanel" aria-labelledby="t-listen" hidden></div>
   </main>
 </div>
 
 <script>
 (function(){
-  var TABS=["market","news","price","calls"], D=null, period="pct_1d", region="전체", query="";
+  var TABS=["market","news","price","calls","listen"], D=null, period="pct_1d", region="전체", query="";
   function el(tag, cls, text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!==undefined&&text!==null) e.textContent=text; return e; }
   function add(p){ for(var i=1;i<arguments.length;i++){ if(arguments[i]) p.appendChild(arguments[i]); } return p; }
   function link(text, url){ if(!url) return el("span","muted",text); var a=el("a",null,text); a.href=url; a.target="_blank"; a.rel="noopener"; return a; }
@@ -212,7 +262,7 @@ details[open]>summary::before{content:"–"}
     if(D.gaps_ko&&D.gaps_ko.length){ var n=el("details","gaps"); add(n, el("summary",null,"오늘 못 채운 것 "+D.gaps_ko.length+"개")); var gl=el("ul"); D.gaps_ko.forEach(function(x){ gl.appendChild(el("li",null,x)); }); add(n,gl); P.appendChild(n); }
   }
 
-  function companies(){ return D.holdings.filter(function(h){ return h.kind==="기업"&&!h.light&&h.held!==false; }); }
+  function companies(){ return D.holdings.filter(function(h){ return h.kind==="기업"&&!h.light&&(h.held!==false||h.follow); }); }
   function wt(h){ return h.weight===null||h.weight===undefined?"—":fmt(h.weight,2)+"%"; }
   function nd(h,v){ return (v===null||v===undefined)?(h.price.no_data?"데이터 없음":"확인 못 함"):pct(v); }
   function lightNote(){ var l=D.holdings.filter(function(h){ return h.light; }); if(!l.length) return null; return el("p","small muted",l.map(function(h){ return h.name_ko; }).join(", ")+"는 비중이 작아 가격과 실적 날짜만 봅니다."); }
@@ -233,7 +283,7 @@ details[open]>summary::before{content:"–"}
     add(s, lightNote(), controls("news", renderNews)); var list=companies().filter(matches); add(s, jump("news", list)); P.appendChild(s);
     if(!list.length) P.appendChild(el("p","muted","조건에 맞는 기업이 없습니다."));
     list.forEach(function(h){ var c=el("article","co"); c.id="news-"+h.key;
-      var hh=el("div","co-h"); add(hh, el("h3",null,h.name_ko), el("span","tk",h.ticker), el("span","wt","비중 "+fmt(h.weight,2)+"%")); add(c,hh, el("p","small muted",h.one_line_ko));
+      var hh=el("div","co-h"); add(hh, el("h3",null,h.name_ko), el("span","tk",h.ticker), el("span","wt",h.follow&&!h.held?"관심 기업":"비중 "+fmt(h.weight,2)+"%")); add(c,hh, el("p","small muted",h.one_line_ko));
       var evs=(h.events||[]).filter(function(e){ return !e.date||e.date>=D.as_of; });
       var b1=el("div"); add(b1, el("div","sub-h","예정 일정"));
       if(evs.length){ var ul=el("ul","ev"); evs.forEach(function(e){ var li=el("li"); add(li, el("span","d",e.date?md(e.date):"날짜 미정")); var w=el("span"); w.appendChild(document.createTextNode(e.what_ko+" ")); add(w, el("span","tag"+(e.confirmed?"":" est"), e.confirmed?"확정":"예상"), document.createTextNode(" "), e.source_url?link("출처",e.source_url):null); add(li,w); ul.appendChild(li); }); add(b1,ul); }
@@ -266,7 +316,7 @@ details[open]>summary::before{content:"–"}
     var s=el("section","sec"); add(s, el("h2",null,"한눈에 보기"));
     var c=el("div","controls"); [["pct_1d","하루"],["pct_1w","주간"],["pct_1m","월간"]].forEach(function(x){ var b=el("button","chip",x[1]); b.type="button"; b.setAttribute("aria-pressed", String(period===x[0])); b.addEventListener("click", function(){ period=x[0]; renderPrice(); }); c.appendChild(b); }); add(s,c);
     var hm=el("div","heat"); D.holdings.forEach(function(h){ var p=h.price[period]; var t=el("div","tile"); var bg=tint(p); if(bg) t.style.background=bg;
-      add(t, el("div","n",h.name_ko), el("div","p "+cls(p), nd(h,p)), el("div","w",h.held?"보유 · 비중 "+wt(h):"")); hm.appendChild(t); }); add(s,hm); P.appendChild(s);
+      add(t, el("div","n",h.name_ko), el("div","p "+cls(p), nd(h,p)), el("div","w",h.held?"보유 · 비중 "+wt(h):(h.follow?"관심":""))); hm.appendChild(t); }); add(s,hm); P.appendChild(s);
 
     var movers=D.holdings.filter(function(h){ return h.move_note_ko&&h.kind!=="ETF"&&!h.light; });
     if(movers.length){ var sm0=el("section","sec"); add(sm0, el("h2",null,"크게 움직인 종목, 왜 움직였나"), el("p","small muted","확인된 근거만 적었습니다. 이유를 못 찾은 종목은 못 찾았다고 적었습니다."));
@@ -274,7 +324,7 @@ details[open]>summary::before{content:"–"}
     var s2=el("section","sec"); add(s2, el("h2",null,"종목별 가격"));
     var sc=el("div","scroll"), tb=el("table"), thead=el("thead"), tr=el("tr");
     [["종목","l"],["비중",""],["종가",""],["하루",""],["주간",""],["월간",""],["포워드 PER",""],["FCF 수익률",""]].forEach(function(x){ var th=el("th",x[1],x[0]); th.scope="col"; tr.appendChild(th); }); add(thead,tr); add(tb,thead);
-    var body=el("tbody"); D.holdings.forEach(function(h){ var r=el("tr"), p=h.price; var td=el("td","l"); var nm=el("div","nm",h.name_ko); if(h.held) nm.appendChild(el("span","hold","보유")); add(td, nm, el("div","sm",h.ticker+" · "+cur(h.currency))); r.appendChild(td);
+    var body=el("tbody"); D.holdings.forEach(function(h){ var r=el("tr"), p=h.price; var td=el("td","l"); var nm=el("div","nm",h.name_ko); if(h.held) nm.appendChild(el("span","hold","보유")); else if(h.follow) nm.appendChild(el("span","hold","관심")); add(td, nm, el("div","sm",h.ticker+" · "+cur(h.currency))); r.appendChild(td);
       r.appendChild(el("td","num",wt(h)));
       var pc=el("td","num"); if(p.no_data){ pc.className="num flat"; pc.textContent="데이터 없음"; } else add(pc, el("div",null,auto(p.last_close)+" "+cur(h.currency)), el("div","sm",p.last_close_date||"")); r.appendChild(pc);
       [["pct_1d",null],["pct_1w","pct_1w_basis"],["pct_1m","pct_1m_basis"]].forEach(function(k){ var v=p[k[0]]; var t=el("td","num "+cls(v), (v===null||v===undefined)?nd(h,v):pct(v)+(k[1]&&p[k[1]]==="stated"?" *":"")); r.appendChild(t); });
@@ -293,7 +343,7 @@ details[open]>summary::before{content:"–"}
     add(s, controls("calls", renderCalls)); var list=companies().filter(matches); add(s, jump("calls", list)); P.appendChild(s);
     if(!list.length) P.appendChild(el("p","muted","조건에 맞는 기업이 없습니다."));
     list.forEach(function(h){ var e=h.earnings_call; if(!e) return; var c=el("article","brief"); c.id="calls-"+h.key;
-      var hh=el("div","co-h"); add(hh, el("h3",null,h.name_ko), el("span","wt","비중 "+fmt(h.weight,2)+"%"), el("span","small muted",e.period_ko.split(/[(.—]/)[0].trim()+" · 발표 "+e.published_date)); add(c,hh);
+      var hh=el("div","co-h"); add(hh, el("h3",null,h.name_ko), el("span","wt",h.follow&&!h.held?"관심 기업":"비중 "+fmt(h.weight,2)+"%"), el("span","small muted",e.period_ko.split(/[(.—]/)[0].trim()+" · 발표 "+e.published_date)); add(c,hh);
       var B=e.brief;
       if(B){ add(c, el("p","big",B.big_ko)); var ul=el("ul");
         (B.good_ko||[]).forEach(function(x){ ul.appendChild(line("좋았던 점","good",x)); });
@@ -319,6 +369,158 @@ details[open]>summary::before{content:"–"}
     if(keepFocus){ var i=document.getElementById("q-calls"); if(i){ i.focus(); i.setSelectionRange(i.value.length,i.value.length); } }
   }
 
+  /* ───── 듣기: 콜 원고와 한 달 동향을 기기 음성으로 읽어 준다 ───── */
+  var L=null, LF="전체", LSORT="new", Q=[], qi=-1, playing=false, RATE=1, VOICE=null, curU=null, wl=null, qName="", keepT=null, everStarted=false, NOSPEECH=false, watchT=null;
+  var APP_URL="https://jeonjubulldozer.github.io/Work-/stocks/#listen", IN_APP=/github\.io$/.test(location.hostname), WEBVIEW=/; wv\)/.test(navigator.userAgent);
+  try{ RATE=parseFloat(localStorage.getItem("cb-rate"))||1; LF=localStorage.getItem("cb-ls-filter")||"전체"; LSORT=localStorage.getItem("cb-ls-sort")||"new"; }catch(e){}
+  var SVG={play:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>',pause:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z"/></svg>',stop:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3h10v10H3z"/></svg>',prev:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5h2v11H3zM13.5 2.5v11L6 8z"/></svg>',next:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11 2.5h2v11h-2zM2.5 2.5v11L10 8z"/></svg>'};
+  function svgBtn(cls2, icon, text, label){ var b=el("button",cls2); b.type="button"; b.innerHTML=SVG[icon]||""; if(text) b.appendChild(document.createTextNode(text)); if(label) b.setAttribute("aria-label",label); return b; }
+  function canSpeak(){ return ("speechSynthesis" in window)&&("SpeechSynthesisUtterance" in window); }
+  function koVoices(){ try{ return speechSynthesis.getVoices().filter(function(v){ return /^ko/i.test(v.lang); }); }catch(e){ return []; } }
+  function pickVoice(){ var vs=koVoices(); if(!vs.length) return null; var saved=null; try{ saved=localStorage.getItem("cb-voice"); }catch(e){}
+    if(saved){ for(var i=0;i<vs.length;i++) if(vs[i].name===saved) return vs[i]; }
+    var pref=[/Natural/i,/Online/i,/Google/i,/SunHi|InJoon|Yuna|유나|Heami|Sora|Jian/i];
+    for(var p=0;p<pref.length;p++) for(var j=0;j<vs.length;j++) if(pref[p].test(vs[j].name)) return vs[j];
+    return vs[0]; }
+  function sayDate(s){ if(!s) return ""; var d=new Date(s+"T00:00:00"); if(isNaN(d)) return s; return (d.getMonth()+1)+"월 "+d.getDate()+"일"; }
+  function mins(n){ var m=Math.max(1,Math.round(n/(330*RATE))); return "약 "+m+"분"; }
+  function chunks(text){ var s=String(text||"").replace(/\s+/g," ").trim(); if(!s) return [];
+    var sent=s.replace(/([.!?])\s+/g,"$1\u0001").split("\u0001"), out=[], buf="";
+    sent.forEach(function(x){ if(x.length>170){ if(buf){ out.push(buf); buf=""; } var parts=x.replace(/,\s+/g,",\u0001").split("\u0001"), b2=""; parts.forEach(function(p){ if((b2+" "+p).length>150&&b2){ out.push(b2); b2=p; } else b2=b2?b2+" "+p:p; }); if(b2) out.push(b2); return; }
+      if((buf+" "+x).length>150&&buf){ out.push(buf); buf=x; } else buf=buf?buf+" "+x:x; });
+    if(buf) out.push(buf); return out; }
+  function entries(){ if(!L) return []; var idx={}; D.holdings.forEach(function(h,i){ idx[h.key]={i:i,h:h}; });
+    var list=(L.order||Object.keys(L.companies)).filter(function(k){ return L.companies[k]; }).map(function(k){ var c=L.companies[k], m=idx[k]; return {key:k, c:c, held:!!(m&&m.h.held), follow:!!(m&&m.h.follow), pos:m?m.i:999}; });
+    if(LF==="보유") list=list.filter(function(e){ return e.held; }); else if(LF==="관심") list=list.filter(function(e){ return !e.held; });
+    return list; }
+  function byNew(a,b){ var x=(a.c.call&&a.c.call.date)||"", y=(b.c.call&&b.c.call.date)||""; return x<y?1:(x>y?-1:a.pos-b.pos); }
+  function byBoard(a,b){ return a.pos-b.pos; }
+  function callQueue(e){ var c=e.c, k=c.call, q=[]; if(!k) return q; var nm=c.name_ko||e.key;
+    q.push({t:nm+". "+k.title_ko+". "+sayDate(k.date)+" 콜입니다.", id:null, name:nm, part:"실적 콜", key:e.key});
+    (k.parts||[]).forEach(function(pt,pi){ q.push({t:pt.h+".", id:null, name:nm, part:pt.h, key:e.key});
+      (pt.p||[]).forEach(function(par,j){ chunks(par).forEach(function(ch){ q.push({t:ch, id:"lc-"+e.key+"-"+pi+"-"+j, name:nm, part:pt.h, key:e.key}); }); }); });
+    return q; }
+  function trendQueue(e){ var c=e.c, t=c.trend, q=[]; if(!t) return q; var nm=c.name_ko||e.key;
+    q.push({t:nm+", 지난 한 달 동향입니다.", id:null, name:nm, part:"한 달 동향", key:e.key});
+    (t.month_ko||[]).forEach(function(par,j){ chunks(par).forEach(function(ch){ q.push({t:ch, id:"lt-"+e.key+"-m-"+j, name:nm, part:"한 달 동향", key:e.key}); }); });
+    if(t.week&&t.week.length){ q.push({t:"이번 주 소식입니다.", id:null, name:nm, part:"이번 주 소식", key:e.key});
+      t.week.forEach(function(w,j){ chunks(sayDate(w.date)+". "+w.t).forEach(function(ch){ q.push({t:ch, id:"lt-"+e.key+"-w-"+j, name:nm, part:"이번 주 소식", key:e.key}); }); }); }
+    if(t.next_ko) chunks(t.next_ko).forEach(function(ch){ q.push({t:ch, id:"lt-"+e.key+"-n", name:nm, part:"다음 일정", key:e.key}); });
+    return q; }
+  function qLen(q){ return q.reduce(function(s,x){ return s+x.t.length; },0); }
+
+  function mark(it){ var old=document.querySelectorAll(".now"); for(var i=0;i<old.length;i++) old[i].classList.remove("now");
+    if(!it||!it.id) return; var n=document.getElementById(it.id); if(!n) return; n.classList.add("now");
+    var dd=n.closest("details"); if(dd&&!dd.open) return; var tab=document.getElementById("p-listen"); if(tab&&tab.hidden) return;
+    try{ var r=n.getBoundingClientRect(); if(r.top<110||r.bottom>window.innerHeight-150) n.scrollIntoView({behavior:"smooth",block:"center"}); }catch(e){} }
+  function lockOn(){ try{ if(navigator.wakeLock&&!wl) navigator.wakeLock.request("screen").then(function(x){ wl=x; x.addEventListener&&x.addEventListener("release",function(){ wl=null; }); }).catch(function(){}); }catch(e){} }
+  function lockOff(){ try{ if(wl){ wl.release(); wl=null; } }catch(e){} }
+  document.addEventListener("visibilitychange", function(){ if(document.visibilityState==="visible"&&playing) lockOn(); });
+  function speakAt(i){
+    if(i<0) i=0; if(i>=Q.length){ stopAll(); return; }
+    qi=i; var it=Q[i], u=new SpeechSynthesisUtterance(it.t); u.lang="ko-KR"; if(VOICE) u.voice=VOICE; u.rate=RATE;
+    u.onstart=function(){ everStarted=true; };
+    u.onend=function(){ if(curU!==u) return; if(!everStarted){ failSpeech(); return; } if(playing) speakAt(qi+1); };
+    u.onerror=function(ev){ if(curU!==u) return; if(ev&&(ev.error==="interrupted"||ev.error==="canceled")) return; if(!everStarted){ failSpeech(); return; } if(playing) speakAt(qi+1); };
+    curU=u; mark(it); paintMini();
+    try{ speechSynthesis.speak(u); }catch(e){ stopAll(); }
+    try{ if(navigator.mediaSession&&window.MediaMetadata) navigator.mediaSession.metadata=new MediaMetadata({title:it.name+" · "+it.part, artist:"기업 현황판 듣기"}); }catch(e){}
+  }
+  function restartAt(i){ curU=null; var was=false; try{ was=speechSynthesis.speaking||speechSynthesis.pending; speechSynthesis.cancel(); }catch(e){} if(was) setTimeout(function(){ if(playing) speakAt(i); },90); else speakAt(i); }
+  function loadListen(){ fetch("listen.json",{cache:"no-store"}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }).then(function(j){ L=j; renderListen(); }).catch(function(){ L=null; renderListen(); }); }
+  function startQueue(q, name){ if(!canSpeak()||!q.length) return; VOICE=pickVoice(); curU=null; try{ speechSynthesis.cancel(); }catch(e){}
+    Q=q; qName=name; playing=true; everStarted=false; lockOn(); speakAt(0); keepAlive();
+    if(watchT) clearTimeout(watchT); watchT=setTimeout(function(){ if(Q.length&&!everStarted) failSpeech(); },4000); }
+  function failSpeech(){ stopAll(); NOSPEECH=true; var n=document.getElementById("ls-nospeech"); if(n){ n.hidden=false; try{ n.scrollIntoView({behavior:"smooth",block:"center"}); }catch(e){} } }
+  function pauseIt(){ playing=false; curU=null; try{ speechSynthesis.cancel(); }catch(e){} paintMini(); }
+  function resumeIt(){ if(!Q.length) return; playing=true; lockOn(); restartAt(qi<0?0:qi); }
+  function stopAll(){ playing=false; curU=null; try{ speechSynthesis.cancel(); }catch(e){} Q=[]; qi=-1; mark(null); lockOff(); paintMini(); }
+  function paraStart(i){ var id=Q[i]&&Q[i].id; while(i>0&&id&&Q[i-1].id===id) i--; return i; }
+  function jumpPara(dir){ if(!Q.length) return; var i=qi;
+    if(dir>0){ var id=Q[i].id; i++; while(i<Q.length&&id&&Q[i].id===id) i++; }
+    else { var s=paraStart(i); i=(i-s>0)?s:paraStart(Math.max(0,s-1)); }
+    playing=true; restartAt(i); }
+  function nextCompany(){ if(!Q.length) return; var k=Q[qi].key, i=qi; while(i<Q.length&&Q[i].key===k) i++; if(i>=Q.length){ stopAll(); return; } playing=true; restartAt(i); }
+  function setRate(r){ RATE=r; try{ localStorage.setItem("cb-rate",String(r)); }catch(e){} if(playing) restartAt(qi); paintMini(); renderListenTopOnly(); }
+  function keepAlive(){ if(keepT) clearInterval(keepT); keepT=setInterval(function(){ if(!playing){ clearInterval(keepT); keepT=null; return; }
+      var gv=VOICE&&/Google/i.test(VOICE.name), android=/Android/i.test(navigator.userAgent);
+      if(gv&&!android&&speechSynthesis.speaking){ try{ speechSynthesis.pause(); speechSynthesis.resume(); }catch(e){} } }, 10000); }
+  try{ if(navigator.mediaSession){ navigator.mediaSession.setActionHandler("play",function(){ resumeIt(); }); navigator.mediaSession.setActionHandler("pause",function(){ pauseIt(); }); navigator.mediaSession.setActionHandler("nexttrack",function(){ jumpPara(1); }); navigator.mediaSession.setActionHandler("previoustrack",function(){ jumpPara(-1); }); } }catch(e){}
+
+  var MP=null;
+  function buildMini(){ MP=el("div","mp"); MP.hidden=true; MP.setAttribute("role","region"); MP.setAttribute("aria-label","듣기 재생 막대");
+    var inn=el("div","in"), t1=el("div","t1"), t2=el("div","t2"), ctl=el("div","ctl");
+    var bPrev=svgBtn("", "prev", "", "앞 문단"), bMain=svgBtn("main","pause","","일시정지"), bNext=svgBtn("", "next", "", "다음 문단"), bCo=el("button",null,"다음 기업"), sp=el("span","sp"), bRate=el("button","rate"), bStop=svgBtn("", "stop", "", "끄기");
+    bCo.type="button"; bRate.type="button"; bRate.setAttribute("aria-label","읽는 속도 바꾸기");
+    bPrev.addEventListener("click",function(){ jumpPara(-1); }); bNext.addEventListener("click",function(){ jumpPara(1); }); bCo.addEventListener("click",nextCompany);
+    bMain.addEventListener("click",function(){ if(playing) pauseIt(); else resumeIt(); }); bStop.addEventListener("click",stopAll);
+    bRate.addEventListener("click",function(){ var rs=[0.9,1,1.2,1.4,1.6], i=rs.indexOf(RATE); setRate(rs[(i+1)%rs.length]); });
+    add(ctl,bPrev,bMain,bNext,bCo,sp,bRate,bStop); add(inn,t1,t2,ctl); MP.appendChild(inn); document.body.appendChild(MP);
+    MP._={t1:t1,t2:t2,main:bMain,rate:bRate}; }
+  function paintMini(){ if(!MP) buildMini(); var on=Q.length>0; MP.hidden=!on; var w=document.querySelector(".wrap"); if(w) w.classList.toggle("has-mp",on); if(!on) return;
+    var it=Q[qi]||Q[0]; MP._.t1.textContent=qName; MP._.t2.textContent=it.name+" · "+it.part+" · "+(qi+1)+"/"+Q.length;
+    MP._.main.innerHTML=playing?SVG.pause:SVG.play; MP._.main.setAttribute("aria-label",playing?"일시정지":"이어 듣기"); MP._.rate.textContent=(RATE===1?"1.0":String(RATE))+"배"; }
+
+  var TOP=null;
+  function renderListenTopOnly(){ if(TOP&&TOP._paint) TOP._paint(); }
+  function chipRow(opts, cur, onPick){ var c=el("div","controls"); opts.forEach(function(o){ var b=el("button","chip",o[1]); b.type="button"; b.setAttribute("aria-pressed",String(cur===o[0])); b.addEventListener("click",function(){ onPick(o[0]); }); c.appendChild(b); }); return c; }
+  function renderListen(){
+    var P=document.getElementById("p-listen"); P.textContent="";
+    if(!L){ P.appendChild(el("div","err","듣기 원고를 불러오지 못했습니다. 페이지를 새로 고쳐 보세요.")); return; }
+    var s0=el("section","sec"); add(s0, el("h2",null,"듣기"), el("p","small muted","실적 콜과 한 달 동향을 한국어로 읽어 드립니다. 콜을 문장 그대로 옮긴 번역이 아니라, 경영진 발표의 주제와 애널리스트 질문을 하나도 빼지 않고 요지와 숫자로 풀어 쓴 원고입니다. 휴대폰은 화면이 켜져 있어야 계속 읽습니다."));
+    TOP=el("div","lis-top");
+    var ns=el("div","note"); ns.id="ls-nospeech"; ns.hidden=!(NOSPEECH||!canSpeak()||(WEBVIEW&&!IN_APP));
+    add(ns, el("b",null,"이 화면에서는 소리가 나지 않습니다. "), document.createTextNode(IN_APP?"휴대폰 설정에서 텍스트 음성 변환(TTS) 엔진에 한국어 목소리가 깔려 있는지 확인해 주세요.":"클로드 앱 안의 화면은 휴대폰 음성 엔진에 연결되지 않습니다. 휴대폰에서는 현황판 앱(크롬)의 기업 현황판 → 듣기 탭에서 들으시면 됩니다. "));
+    if(!IN_APP) add(ns, link("현황판 앱에서 듣기", APP_URL)); add(TOP, ns);
+    var r1=el("div","row"); var allNew=entries().filter(function(e){ return e.c.call; }).sort(byNew), allTr=entries().filter(function(e){ return e.c.trend; }).sort(byBoard);
+    var qc=[]; allNew.forEach(function(e){ qc=qc.concat(callQueue(e)); }); var qt=[]; allTr.forEach(function(e){ qt=qt.concat(trendQueue(e)); });
+    var b1=svgBtn("btn pri","play","새로 나온 콜부터 이어 듣기"), b2=svgBtn("btn","play","한 달 동향·이번 주 소식 이어 듣기");
+    b1.addEventListener("click",function(){ startQueue(qc,"새로 나온 콜부터 · "+allNew.length+"곳"); }); b2.addEventListener("click",function(){ startQueue(qt,"한 달 동향·이번 주 소식 · "+allTr.length+"곳"); });
+    if(!canSpeak()){ b1.disabled=true; b2.disabled=true; }
+    add(r1,b1,b2); add(TOP,r1);
+    var r2=el("div","row"); add(r2, el("span","lbl","속도")); var rateWrap=el("span"); add(r2,rateWrap);
+    var r3=el("div","row"); add(r3, el("span","lbl","목소리")); var sel=el("select"); sel.id="ls-voice"; sel.setAttribute("aria-label","읽어 주는 목소리"); add(r3,sel); var vnote=el("span","small muted"); add(r3,vnote);
+    function fillVoices(){ var vs=koVoices(), cur=pickVoice(); sel.textContent="";
+      if(!vs.length){ var o=el("option",null,"한국어 기본 목소리"); o.value=""; sel.appendChild(o); vnote.textContent=canSpeak()?"이 기기에 한국어 목소리가 따로 없으면 소리가 안 날 수 있습니다.":""; return; }
+      vnote.textContent=""; vs.forEach(function(v){ var o=el("option",null,v.name.replace(/Microsoft |Google /,"")+(v.localService===false?" · 온라인":"")); o.value=v.name; if(cur&&cur.name===v.name) o.selected=true; sel.appendChild(o); }); }
+    sel.addEventListener("change",function(){ try{ localStorage.setItem("cb-voice",sel.value); }catch(e){} VOICE=pickVoice(); if(playing) restartAt(qi); });
+    if(canSpeak()){ fillVoices(); try{ speechSynthesis.addEventListener("voiceschanged",fillVoices); }catch(e){ speechSynthesis.onvoiceschanged=fillVoices; } }
+    TOP._paint=function(){ rateWrap.textContent=""; rateWrap.appendChild(chipRow([[0.9,"0.9배"],[1,"1.0배"],[1.2,"1.2배"],[1.4,"1.4배"],[1.6,"1.6배"]],RATE,function(r){ setRate(r); })); };
+    TOP._paint(); add(TOP,r2,r3); add(s0,TOP);
+    var fr=el("div","controls"); add(fr, chipRow([["전체","전체"],["보유","보유"],["관심","관심"]],LF,function(v){ LF=v; try{ localStorage.setItem("cb-ls-filter",v); }catch(e){} renderListen(); }), chipRow([["new","최근 콜 순"],["board","현황판 순"]],LSORT,function(v){ LSORT=v; try{ localStorage.setItem("cb-ls-sort",v); }catch(e){} renderListen(); }));
+    add(s0,fr); P.appendChild(s0);
+
+    var list=entries().slice().sort(LSORT==="new"?byNew:byBoard);
+    var s1=el("section","sec"); add(s1, el("h2",null,"실적 콜"), el("p","small muted","기업마다 가장 최근에 열린 콜입니다. 새 콜이 열리면 다음 날 아침 갱신 때 바뀝니다.")); P.appendChild(s1);
+    list.forEach(function(e){ var k=e.c.call; if(!k) return; var nm=e.c.name_ko||e.key, q=callQueue(e);
+      var c=el("article","lis-card"); c.id="lsc-"+e.key; var hh=el("div","co-h"); add(hh, el("h3",null,nm), el("span","wt",e.held?"보유":"관심"), k.full===false?el("span","tag nofull","녹취록 없음"):null); add(c,hh);
+      add(c, el("div","meta",k.title_ko+" · "+md(k.date)+" · "+mins(qLen(q))));
+      var acts=el("div","acts"), bp=svgBtn("btn pri","play","콜 듣기"); bp.addEventListener("click",function(){ startQueue(q,nm+" · "+k.title_ko); }); if(!canSpeak()) bp.disabled=true; add(acts,bp);
+      if(e.c.trend){ var bt=svgBtn("btn","play","한 달 동향 듣기"); bt.addEventListener("click",function(){ startQueue(trendQueue(e),nm+" · 한 달 동향"); }); if(!canSpeak()) bt.disabled=true; add(acts,bt); }
+      if(k.replay&&k.replay.url) add(acts, link(k.replay.name||"원문 다시 듣기", k.replay.url)); add(c,acts);
+      var dt=el("details"); add(dt, el("summary",null,"원고 펼쳐 보기")); var sc=el("div","script");
+      (k.parts||[]).forEach(function(pt,pi){ var sec=el("section"); add(sec, el("h4",null,pt.h)); (pt.p||[]).forEach(function(par,j){ var p=el("p",null,par); p.id="lc-"+e.key+"-"+pi+"-"+j; sec.appendChild(p); }); sc.appendChild(sec); });
+      if(k.basis_ko) add(sc, el("p","src",k.basis_ko));
+      var so=el("div","src"); so.appendChild(document.createTextNode("출처: ")); (k.sources||[]).forEach(function(x,i){ if(i) so.appendChild(document.createTextNode(" · ")); so.appendChild(link(x.name,x.url)); }); add(sc,so);
+      add(dt,sc); add(c,dt); s1.appendChild(c); });
+
+    var s2=el("section","sec"); add(s2, el("h2",null,"한 달 동향 · 이번 주 소식"), el("p","small muted","시황이 아니라 이 회사에 있었던 일만 담았습니다. 매일 아침 갱신합니다.")); P.appendChild(s2);
+    list.slice().sort(byBoard).forEach(function(e){ var t=e.c.trend; if(!t) return; var nm=e.c.name_ko||e.key;
+      var c=el("article","lis-card"); c.id="lst-"+e.key; var hh=el("div","co-h"); add(hh, el("h3",null,nm), el("span","wt",e.held?"보유":"관심"), el("span","small muted",md(t.as_of)+" 기준")); add(c,hh);
+      (t.month_ko||[]).forEach(function(par,j){ var p=el("p","tp",par); p.id="lt-"+e.key+"-m-"+j; c.appendChild(p); });
+      if(t.week&&t.week.length){ add(c, el("div","sub-h","이번 주 소식")); var ul=el("ul","wk"); t.week.forEach(function(w,j){ var li=el("li"); li.id="lt-"+e.key+"-w-"+j; add(li, el("span","d",md(w.date)), el("span",null,w.t)); ul.appendChild(li); }); add(c,ul); }
+      if(t.next_ko){ var nx=el("p","tp small muted",t.next_ko); nx.id="lt-"+e.key+"-n"; add(c,nx); }
+      var acts=el("div","acts"), bt=svgBtn("btn","play","동향 듣기"); bt.addEventListener("click",function(){ startQueue(trendQueue(e),nm+" · 한 달 동향"); }); if(!canSpeak()) bt.disabled=true; add(acts,bt); add(c,acts);
+      if(t.sources&&t.sources.length){ var so=el("div","src"); so.appendChild(document.createTextNode("출처: ")); t.sources.forEach(function(x,i){ if(i) so.appendChild(document.createTextNode(" · ")); so.appendChild(link(x.name,x.url)); }); add(c,so); }
+      s2.appendChild(c); });
+
+    var have={}; Object.keys(L.companies).forEach(function(k){ have[k]=1; });
+    var pend=D.holdings.filter(function(h){ return h.kind==="기업"&&!have[h.key]&&(LF==="전체"||(LF==="보유"?h.held:!h.held)); }).map(function(h){ return h.name_ko; }).concat((L.pending_ko||[]).filter(function(n){ return LF!=="보유"; }));
+    if(pend.length) P.appendChild(el("p","pend","원고 준비 중: "+pend.join(", ")+". 오늘 안에 채웁니다."));
+    if(L.updated_ko) P.appendChild(el("p","pend",L.updated_ko));
+    if(Q.length){ mark(Q[qi]); }
+  }
+
   function show(tab, scroll){
     if(TABS.indexOf(tab)<0) tab="market";
     TABS.forEach(function(t){ document.getElementById("p-"+t).hidden = t!==tab; document.getElementById("t-"+t).setAttribute("aria-selected", String(t===tab)); });
@@ -331,7 +533,7 @@ details[open]>summary::before{content:"–"}
     show(t,false);
     TABS.forEach(function(k){ document.getElementById("t-"+k).addEventListener("click", function(){ show(k,true); }); });
   }
-  fetch("data.json").then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }).then(function(j){ D=j; start(); })
+  fetch("data.json").then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }).then(function(j){ D=j; start(); loadListen(); })
     .catch(function(){ var m=document.querySelector("main"); m.textContent=""; var b=el("div","err"); b.textContent="자료를 불러오지 못했습니다. 페이지를 새로 고쳐 보세요. 계속 안 되면 Claude에게 '기업 현황판이 안 열린다'고 알려 주세요."; m.appendChild(b); document.getElementById("sub").textContent=""; });
 })();
 </script>
