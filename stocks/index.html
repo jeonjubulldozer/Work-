@@ -220,7 +220,7 @@ select{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line)
   function cls(p){ return p===null||p===undefined?"flat":(p>0?"up":(p<0?"down":"flat")); }
   function pct(p){ if(p===null||p===undefined) return "확인 못 함"; return (p>0?"▲ +":(p<0?"▼ ":"")+"")+fmt(p,2)+"%"; }
   function md(s){ if(!s) return "날짜 미정"; var d=new Date(s+"T00:00:00"); if(isNaN(d)) return s; return (d.getMonth()+1)+"/"+d.getDate()+" ("+"일월화수목금토".charAt(d.getDay())+")"; }
-  function cur(c){ return {SEK:"크로나",GBP:"파운드",EUR:"유로",USD:"달러",KRW:"원"}[c]||c; }
+  function cur(c){ return {SEK:"크로나",GBP:"파운드",EUR:"유로",USD:"달러",KRW:"원",CAD:"캐나다 달러",DKK:"크로네"}[c]||c; }
   function pctSpan(label, p, basis){ var s=el("span",cls(p), label+" "+pct(p)+(basis==="stated"?" *":"")); return s; }
 
   function renderHead(){
